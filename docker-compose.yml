@@ -1,0 +1,45 @@
+version: '3'
+
+networks:
+  app-net:
+    driver: bridge
+
+services:
+    rsvp-db:
+      image: mongo:3.3
+      networks:
+        - app-net
+      expose:
+        - "27017"
+      ports:
+        - "32567:27017"
+        
+    test-app1:
+      image: vaibhav2016/pyflaskui
+      networks:
+        - app-net
+      environment:
+        - MONGODB_HOST=rsvp-db
+        - MONGODB_PORT=27017
+        - TEXT2=This is Test App1
+      expose:
+        - "5000"
+      ports:
+        - "8081:5000"
+      depends_on:
+        - rsvp-db
+
+    test-app2:
+      image: vaibhav2016/pyflaskui
+      networks:
+        - app-net
+      environment:
+        - MONGODB_HOST=rsvp-db
+        - MONGODB_PORT=27017
+        - TEXT2=This is Test App2
+      expose:
+        - "5000"
+      ports:
+        - "8082:5000"
+      depends_on:
+        - rsvp-db
