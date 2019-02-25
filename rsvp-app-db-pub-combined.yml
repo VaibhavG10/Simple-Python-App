@@ -1,0 +1,122 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: testapp1
+  labels:
+    app: testapp1
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: testapp1
+  template:
+    metadata:
+      labels:
+        app: testapp1
+    spec:
+      containers:
+      - name: test-app1
+        image: vaibhav2016/pyflaskui
+        env:
+        - name: MONGODB_HOST
+          value: a.b.c.d
+        - name: MONGODB_PORT
+          value: '32567'
+        ports:
+        - containerPort: 5000
+          name: web-port
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: testapp1
+  labels:
+    app: testapp1
+spec:
+  type: NodePort
+  ports:
+  - port: 80
+    targetPort: web-port
+    protocol: TCP
+  selector:
+    app: testapp1
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: testapp2
+  labels:
+    app: testapp2
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: testapp2
+  template:
+    metadata:
+      labels:
+        app: testapp2
+    spec:
+      containers:
+      - name: test-app2
+        image: vaibhav2016/pyflaskui
+        env:
+        - name: MONGODB_HOST
+          value: a.b.c.d
+        - name: MONGODB_PORT
+          value: '32567'
+        ports:
+        - containerPort: 5000
+          name: web-port
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: testapp2
+  labels:
+    app: testapp2
+spec:
+  type: NodePort
+  ports:
+  - port: 80
+    targetPort: web-port
+    protocol: TCP
+  selector:
+    app: testapp2
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rsvp-db
+  labels:
+    appdb: rsvpdb
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      appdb: rsvpdb
+  template:
+    metadata:
+      labels:
+        appdb: rsvpdb
+    spec:
+      containers:
+      - name: rsvp-db
+        image: mongo:3.3
+        ports:
+        - containerPort: 27017
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongodb
+  labels:
+    app: rsvpdb
+spec:
+  type: NodePort
+  ports:
+  - port: 27017
+    nodePort: 32567
+    protocol: TCP
+  selector:
+    appdb: rsvpdb
